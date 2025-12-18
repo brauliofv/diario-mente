@@ -9,13 +9,8 @@ import { DriveService } from './driveService.js';
 
 class App {
     constructor() {
-
         
-
-
         this.container = document.getElementById('app-container');
-        
-        // Suscribirse a cambios del store
         store.subscribe(this.render.bind(this));
         
         // Inicializar Servicios
@@ -32,6 +27,10 @@ class App {
         const donateModal = document.getElementById('donate-modal');
         const closeDonate = document.getElementById('close-donate');
         const donateContent = document.getElementById('donate-content');
+
+        window.addEventListener('online', () => this.updateGlobalStatus());
+        window.addEventListener('offline', () => this.updateGlobalStatus());
+
 
         if (donateBtn && donateModal) {
             // Abrir
@@ -62,14 +61,11 @@ class App {
             });
         }
 
-
-
-        window.addEventListener('online', () => this.updateGlobalStatus());
-        window.addEventListener('offline', () => this.updateGlobalStatus());
+        
         
         // Render inicial
         this.render(store.state);
-        this.updateNetStatus(navigator.onLine);
+        this.updateGlobalStatus();
 
         createIcons({ icons });
     }
