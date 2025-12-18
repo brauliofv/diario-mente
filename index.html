@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NeuroLog - Diario de Memoria</title>
+    
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+    
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- El CSS se importa vía JS en Vite o directamente aquí si ya está compilado, 
+         pero para desarrollo Vite inyecta el CSS desde main.js o estilo directo -->
+    <!-- Enlazamos el CSS que ahora tiene las directivas de Tailwind -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="bg-[#E7E5E4] text-stone-800 transition-colors duration-500 min-h-screen selection:bg-amber-200 selection:text-amber-900">
+
+    <!-- UI Elements -->
+    <div id="status-indicator" class="fixed top-6 left-6 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full shadow-lg text-xs font-bold border bg-white border-stone-200 text-stone-600 transition-all">
+        <i data-lucide="wifi" class="w-4 h-4"></i>
+        <span id="status-text">Offline</span>
+    </div>
+
+    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-full shadow-lg transition-transform hover:scale-110 bg-white text-stone-600 hover:text-amber-600">
+        <i data-lucide="moon" class="w-5 h-5"></i>
+    </button>
+
+    <div id="app-container" class="max-w-4xl mx-auto py-8 px-4 sm:px-6 relative min-h-screen flex flex-col"></div>
+
+    <!-- PUNTO DE ENTRADA PRINCIPAL -->
+    <!-- Vite procesará esto y todas sus importaciones -->
+    <script type="module" src="/js/app.js"></script>
+
+    <!-- ... (Todo tu código anterior) ... -->
+
+    <!-- BOTÓN DE DONACIÓN (Flotante Abajo Izquierda) -->
+    <button id="donate-btn" class="fixed bottom-6 left-6 z-50 p-3 rounded-full shadow-lg transition-transform hover:scale-110 bg-white text-rose-500 border border-rose-100 hover:bg-rose-50 group" title="Apoyar el proyecto">
+        <i data-lucide="heart" class="w-6 h-6 fill-transparent group-hover:fill-rose-500 transition-colors"></i>
+    </button>
+
+    <!-- MODAL DE DONACIÓN (Oculto por defecto) -->
+    <div id="donate-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl max-w-sm w-full p-6 relative transform scale-95 transition-transform duration-300 border dark:border-stone-700" id="donate-content">
+            
+            <!-- Botón Cerrar -->
+            <button id="close-donate" class="absolute top-3 right-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Contenido -->
+            <div class="text-center">
+                <div class="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-500">
+                    <i data-lucide="coffee" class="w-8 h-8"></i>
+                </div>
+                
+                <h3 class="text-xl font-bold font-serif mb-2 text-stone-800 dark:text-stone-100">¿Te gusta NeuroLog?</h3>
+                
+                <p class="text-stone-600 dark:text-stone-400 mb-6 leading-relaxed">
+                    Mantener este proyecto vivo y gratuito requiere tiempo y café. 
+                    <br><span class="text-sm mt-2 block">Tu donativo me ayuda a seguir mejorando esta y otras herramientas.</span>
+                </p>
+                
+                <a href="https://ko-fi.com/brauliofv" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-bold text-white bg-[#FF5E5B] hover:bg-[#ff4642] shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                    <i data-lucide="heart" class="w-5 h-5 fill-white"></i> Invítame un Café
+                </a>
+                
+                <div class="mt-4 text-xs text-stone-400">
+                    A través de Ko-fi (Seguro y Rápido)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN MODULE -->
+    <script type="module" src="/js/app.js"></script>
+</body>
+
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+// js/app.js
+
+// 1. IMPORTACIONES CORRECTAS (Vital para que funcione con Vite/NPM)
+import { createIcons, icons } from 'lucide'; // <--- CAMBIO IMPORTANTE
+import { store } from './store.js';
+import { Render } from './render.js';
+import { AppStep, MEMORY_ITEMS_POOL, TIPS_DB } from './constants.js';
+import { DriveService } from './driveService.js';
+
+class App {
+    constructor() {
+
+        
+
+
+        this.container = document.getElementById('app-container');
+        
+        // Suscribirse a cambios del store
+        store.subscribe(this.render.bind(this));
+        
+        // Inicializar Servicios
+        store.init();
+        DriveService.init((success) => console.log("Drive API Loaded:", success));
+
+        // Eventos Globales del DOM
+        const themeBtn = document.getElementById('theme-toggle');
+        if(themeBtn) themeBtn.addEventListener('click', () => store.toggleTheme());
+        
+
+        // --- LÓGICA DEL BOTÓN DE DONACIÓN (NUEVO) ---
+        const donateBtn = document.getElementById('donate-btn');
+        const donateModal = document.getElementById('donate-modal');
+        const closeDonate = document.getElementById('close-donate');
+        const donateContent = document.getElementById('donate-content');
+
+        if (donateBtn && donateModal) {
+            // Abrir
+            donateBtn.addEventListener('click', () => {
+                donateModal.classList.remove('hidden');
+                // Pequeño timeout para permitir la animación de opacidad
+                setTimeout(() => {
+                    donateModal.classList.remove('opacity-0');
+                    donateContent.classList.remove('scale-95');
+                    donateContent.classList.add('scale-100');
+                }, 10);
+            });
+
+            // Función Cerrar
+            const closeModal = () => {
+                donateModal.classList.add('opacity-0');
+                donateContent.classList.remove('scale-100');
+                donateContent.classList.add('scale-95');
+                setTimeout(() => donateModal.classList.add('hidden'), 300);
+            };
+
+            // Cerrar con botón X
+            if(closeDonate) closeDonate.addEventListener('click', closeModal);
+
+            // Cerrar clicando fuera (overlay)
+            donateModal.addEventListener('click', (e) => {
+                if (e.target === donateModal) closeModal();
+            });
+        }
+
+
+
+        window.addEventListener('online', () => this.updateNetStatus(true));
+        window.addEventListener('offline', () => this.updateNetStatus(false));
+        
+        // Render inicial
+        this.render(store.state);
+        this.updateNetStatus(navigator.onLine);
+
+        createIcons({ icons });
+    }
+
+    updateNetStatus(online) {
+        const el = document.getElementById('status-indicator');
+        const txt = document.getElementById('status-text');
+        if (el && txt) {
+            if(online) {
+                el.className = el.className.replace('text-red-600 bg-red-50', 'text-stone-600 bg-white');
+                txt.innerText = "En línea";
+            } else {
+                el.className = el.className.replace('text-stone-600 bg-white', 'text-red-600 bg-red-50');
+                txt.innerText = "Offline";
+            }
+        }
+        // 2. USO CORRECTO DE LUCIDE
+        createIcons({ icons }); // <--- CAMBIO: Ya no usamos lucide.createIcons, sino la función importada
+    }
+
+    // Navegación
+    startSession(mode) { 
+        store.startSession(mode); 
+        this.startTimer(120);
+    }
+    
+    goHome() { store.setStep(AppStep.WELCOME); }
+    goToHistory() { store.setStep(AppStep.HISTORY); }
+    
+    // Timer
+    // Reemplaza toda la función startTimer con esto:
+    startTimer(seconds) {
+        // Limpiar intervalo anterior si existe
+        if (store.state.timerInterval) clearInterval(store.state.timerInterval);
+        
+        // Actualizamos el estado inicial SIN disparar renderizado (mutación directa)
+        store.state.timer = seconds;
+        
+        // Actualizar visualmente el timer inicial si existe el elemento
+        const updateVisualTimer = (val) => {
+            const el = document.getElementById('timer-display');
+            if (el) {
+                const m = Math.floor(val / 60);
+                const s = val % 60;
+                el.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                if (val < 10) {
+                    el.classList.add('text-red-500', 'animate-pulse');
+                } else {
+                    el.classList.remove('text-red-500', 'animate-pulse');
+                }
+            }
+        };
+
+        // Pintar el tiempo inicial
+        updateVisualTimer(seconds);
+        
+        const tick = () => {
+            if (store.state.isPaused) return;
+            
+            let t = store.state.timer - 1;
+            
+            // --- AQUÍ ESTABA EL ERROR ---
+            // Antes usábamos store.setState({ timer: t }), lo que redibujaba TODO.
+            // Ahora actualizamos la variable en silencio:
+            store.state.timer = t; 
+            
+            // Y actualizamos SOLO el numerito en el HTML:
+            updateVisualTimer(t);
+
+            if (t <= 0) {
+                clearInterval(store.state.timerInterval);
+                this.nextStep();
+            }
+        };
+
+        store.state.timerInterval = setInterval(tick, 1000);
+    }
+
+    togglePause() { store.setState({ isPaused: !store.state.isPaused }); }
+
+    updateField(field, value) { 
+        store.state.currentEntry[field] = value; 
+    }
+
+    nextStep() {
+        const current = store.state.currentStep;
+        let next = AppStep.WELCOME;
+        let time = 120;
+
+        const steps = [
+            AppStep.MORNING_RECALL, AppStep.MID_MORNING_RECALL, AppStep.MEMORY_ENCODING,
+            AppStep.AFTERNOON_RECALL, AppStep.MID_AFTERNOON_RECALL, AppStep.SPATIAL_RECALL,
+            AppStep.ANECDOTE, AppStep.MEMORY_RETRIEVAL, AppStep.ANALYSIS, AppStep.COMPLETED
+        ];
+        
+        const idx = steps.indexOf(current);
+        if (idx !== -1 && idx < steps.length - 1) next = steps[idx + 1];
+
+        if (next === AppStep.MEMORY_ENCODING) time = 30;
+        if (next === AppStep.MEMORY_RETRIEVAL) time = 0;
+        if (next === AppStep.ANALYSIS) { 
+            this.analyzeAndFinish(); 
+            return; 
+        }
+
+        store.setStep(next);
+        if (time > 0) this.startTimer(time);
+        else clearInterval(store.state.timerInterval);
+        window.scrollTo(0,0);
+    }
+
+    calendarNav(dir) {
+        if(dir === 1) store.nextMonth();
+        else store.prevMonth();
+    }
+    handleDateSelect(dateStr) { store.selectDate(dateStr); }
+
+    async handleDriveSync() {
+        if (!navigator.onLine) { alert("Sin conexión"); return; }
+        store.setState({ isSyncing: true });
+        try {
+            await DriveService.signIn();
+            const newData = await DriveService.sync(store.state.history);
+            store.updateHistory(newData);
+            alert("Sincronización completada");
+        } catch (e) {
+            console.error(e);
+            alert("Error al sincronizar o login cancelado.");
+        } finally {
+            store.setState({ isSyncing: false });
+        }
+    }
+
+    toggleMemoryItem(id) {
+        const s = store.state.selectedItems;
+        const idx = s.indexOf(id);
+        if (idx > -1) s.splice(idx, 1);
+        else s.push(id);
+        store.setState({ selectedItems: [...s] });
+    }
+
+    async analyzeAndFinish() {
+        store.setStep(AppStep.ANALYSIS);
+        
+        const target = store.state.targetItems.map(i => i.id);
+        const selected = store.state.selectedItems;
+        const correct = selected.filter(id => target.includes(id)).length;
+        const wrong = selected.length - correct;
+        const score = Math.max(0, correct - wrong);
+
+        await new Promise(r => setTimeout(r, 1500));
+        
+        const pool = score >= 3 
+            ? (store.state.sessionMode === 'MORNING' ? TIPS_DB.MORNING : TIPS_DB.EVENING)
+            : TIPS_DB.RECOVERY;
+        const tip = pool[Math.floor(Math.random() * pool.length)];
+        const feedback = `Puntuación: ${score}/5. Consejo para mañana: ${tip}.`;
+
+        store.saveSession(feedback, score);
+        store.setStep(AppStep.COMPLETED);
+    }
+
+    
+
+    // 5. FUNCIONES DE IMPORTAR / EXPORTAR
+    exportLocalData() {
+        const dataStr = JSON.stringify(store.state.history, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `neurolog-backup-${new Date().toISOString().split('T')[0]}.json`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+    importLocalData(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (Array.isArray(parsed)) {
+                    // Mezclar con lo existente
+                    const currentMap = new Map(store.state.history.map(i => [i.id, i]));
+                    let added = 0;
+                    parsed.forEach(item => {
+                        if (!currentMap.has(item.id)) {
+                            currentMap.set(item.id, item);
+                            added++;
+                        }
+                    });
+                    const merged = Array.from(currentMap.values()).sort((a,b) => b.timestamp - a.timestamp);
+                    
+                    store.updateHistory(merged);
+                    alert(`Se importaron ${added} entradas correctamente.`);
+                } else {
+                    alert("El formato del archivo no es válido.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error al leer el archivo.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    
+
+
+
+    render(state) {
+        let html = '';
+        const step = state.currentStep;
+
+        if (step === AppStep.WELCOME) html = Render.welcome(state);
+        else if (step === AppStep.MEMORY_ENCODING) html = Render.encoding(state);
+        else if (step === AppStep.MEMORY_RETRIEVAL) {
+            html = Render.retrieval(state);
+            setTimeout(() => this.renderRetrievalGrid(), 0);
+        }
+        else if (step === AppStep.HISTORY) html = Render.history(state);
+        else if (step === AppStep.ANALYSIS) html = Render.analysis();
+        else if (step === AppStep.COMPLETED) html = Render.completed(state);
+        else html = Render.stepForm(state);
+
+        this.container.innerHTML = html;
+        // 3. REFRESCAR ICONOS DESPUES DE RENDERIZAR
+        createIcons({ icons }); // <--- CAMBIO IMPORTANTE
+    }
+
+    renderRetrievalGrid() {
+        const container = document.getElementById('retrieval-container');
+        if(!container) return;
+
+        const { isDarkMode, selectedItems } = store.state;
+        const c = isDarkMode ? { bg:'bg-stone-800', txt:'text-white', sel:'bg-stone-600 ring-2 ring-stone-400' } : { bg:'bg-white', txt:'text-stone-800', sel:'bg-stone-800 text-white' };
+
+        // Aquí deberías tener acceso a MEMORY_ITEMS_POOL (asegúrate que esté importado)
+        const grid = MEMORY_ITEMS_POOL.map(item => {
+            const isSel = selectedItems.includes(item.id);
+            return `
+            <button data-id="${item.id}" class="p-4 rounded-xl border shadow-sm flex flex-col items-center transition-all ${isSel ? c.sel : c.bg + ' ' + c.txt}">
+                <span class="text-3xl mb-2 pointer-events-none">${item.emoji}</span>
+                <span class="text-xs font-bold uppercase pointer-events-none">${item.name}</span>
+            </button>`;
+        }).join('');
+
+        container.innerHTML = `
+            <h2 class="text-2xl font-bold text-center mb-6 ${isDarkMode?'text-white':'text-stone-800'}">Recuperación</h2>
+            <div class="grid grid-cols-4 gap-3 mb-6">${grid}</div>
+            <button id="btn-finish" class="w-full py-4 rounded-xl font-bold bg-amber-600 text-white shadow-lg">Finalizar</button>
+        `;
+
+        container.querySelectorAll('button[data-id]').forEach(b => {
+            b.onclick = () => this.toggleMemoryItem(b.dataset.id);
+        });
+        document.getElementById('btn-finish').onclick = () => this.analyzeAndFinish();
+    }
+}
+
+// 4. EXPONER LA APP A WINDOW (Crucial para que los onclick="" del HTML funcionen)
+window.app = new App();
