@@ -1,0 +1,22 @@
+{
+  "name": "NeuroLog",
+  "short_name": "NeuroLog",
+  "description": "Diario de memoria y gimnasio mental.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E7E5E4",
+  "theme_color": "#E7E5E4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

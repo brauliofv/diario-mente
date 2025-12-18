@@ -64,8 +64,8 @@ class App {
 
 
 
-        window.addEventListener('online', () => this.updateNetStatus(true));
-        window.addEventListener('offline', () => this.updateNetStatus(false));
+        window.addEventListener('online', () => this.updateGlobalStatus());
+        window.addEventListener('offline', () => this.updateGlobalStatus());
         
         // Render inicial
         this.render(store.state);
@@ -74,20 +74,48 @@ class App {
         createIcons({ icons });
     }
 
-    updateNetStatus(online) {
+    // Nueva función inteligente de estado
+    updateGlobalStatus() {
         const el = document.getElementById('status-indicator');
         const txt = document.getElementById('status-text');
-        if (el && txt) {
-            if(online) {
-                el.className = el.className.replace('text-red-600 bg-red-50', 'text-stone-600 bg-white');
-                txt.innerText = "En línea";
-            } else {
-                el.className = el.className.replace('text-stone-600 bg-white', 'text-red-600 bg-red-50');
-                txt.innerText = "Offline";
-            }
+        const iconContainer = el.querySelector('i') || el; // Fallback por si acaso
+        
+        if (!el || !txt) return;
+
+        const isOnline = navigator.onLine;
+        const isSyncing = store.state.isSyncing;
+        // Revisamos si hay alguna entrada en el historial que tenga synced: false
+        const hasPendingData = store.state.history.some(entry => !entry.synced);
+
+        // Limpiar clases de colores anteriores
+        el.className = "fixed top-6 left-6 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full shadow-lg text-xs font-bold border transition-all duration-300 ";
+
+        // Lógica de estados
+        if (!isOnline) {
+            // Caso 1: Sin Internet (Modo Montaña)
+            el.className += "bg-stone-200 border-stone-300 text-stone-500";
+            txt.innerText = "Offline (Guardado local)";
+            // Cambiamos el icono a wifi-off (necesitas re-renderizar iconos al final)
+            el.innerHTML = `<i data-lucide="wifi-off" class="w-4 h-4"></i> <span id="status-text">${txt.innerText}</span>`;
+        } 
+        else if (isSyncing) {
+            // Caso 2: Subiendo datos
+            el.className += "bg-blue-50 border-blue-200 text-blue-600";
+            el.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span id="status-text">Sincronizando...</span>`;
+        } 
+        else if (hasPendingData) {
+            // Caso 3: Con Internet pero hay datos sin guardar en la nube
+            el.className += "bg-amber-50 border-amber-200 text-amber-600";
+            el.innerHTML = `<i data-lucide="cloud-off" class="w-4 h-4"></i> <span id="status-text">Cambios sin subir</span>`;
+        } 
+        else {
+            // Caso 4: Todo perfecto y sincronizado
+            el.className += "bg-emerald-50 border-emerald-200 text-emerald-600";
+            el.innerHTML = `<i data-lucide="cloud-check" class="w-4 h-4"></i> <span id="status-text">Todo guardado</span>`;
         }
-        // 2. USO CORRECTO DE LUCIDE
-        createIcons({ icons }); // <--- CAMBIO: Ya no usamos lucide.createIcons, sino la función importada
+
+        // Importante: Refrescar iconos tras cambiar el innerHTML
+        import('lucide').then(lucide => lucide.createIcons({ icons: lucide.icons }));
     }
 
     // Navegación
