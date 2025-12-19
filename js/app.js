@@ -42,11 +42,6 @@ class App {
         this.render(store.state);
         this.updateGlobalStatus();
 
-        // 5. Iconos con protección
-        try {
-            createIcons({ icons });
-        } catch (e) { console.log("Iconos no cargados offline"); }
-
         if (donateBtn && donateModal) {
             // Abrir
             donateBtn.addEventListener('click', () => {
@@ -78,10 +73,6 @@ class App {
 
 
 
-        // Render inicial
-        this.render(store.state);
-        this.updateGlobalStatus();
-
         createIcons({ icons });
     }
 
@@ -105,9 +96,7 @@ class App {
         if (!isOnline) {
             // Caso 1: Sin Internet (Modo Montaña)
             el.className += "bg-stone-200 border-stone-300 text-stone-500";
-            txt.innerText = "Offline (Guardado local)";
-            // Cambiamos el icono a wifi-off (necesitas re-renderizar iconos al final)
-            el.innerHTML = `<i data-lucide="wifi-off" class="w-4 h-4"></i> <span id="status-text">${txt.innerText}</span>`;
+            el.innerHTML = `<i data-lucide="wifi-off" class="w-4 h-4"></i> <span id="status-text">Offline</span>`;
         }
         else if (isSyncing) {
             // Caso 2: Subiendo datos
@@ -122,7 +111,7 @@ class App {
         else {
             // Caso 4: Todo perfecto y sincronizado
             el.className += "bg-emerald-50 border-emerald-200 text-emerald-600";
-            el.innerHTML = `<i data-lucide="wifi" class="w-4 h-4"></i>`;
+            el.innerHTML = `<i data-lucide="wifi" class="w-4 h-4"></i> <span id="status-text" class="hidden">Sincronizado</span>`;
         }
 
         // Importante: Refrescar iconos tras cambiar el innerHTML

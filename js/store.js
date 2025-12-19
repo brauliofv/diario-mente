@@ -14,17 +14,17 @@ export const store = {
         isSyncing: false,
         timer: 0,
         timerInterval: null,
-        
+
         // Calendario
         calendarDate: new Date(), // Fecha que se está viendo
         selectedFilterDate: null, // Fecha seleccionada para filtrar historial
-        
+
         currentEntry: {
             id: null, timestamp: 0, date: '', sessionType: 'EVENING',
             morning: '', midMorning: '', afternoon: '', midAfternoon: '',
             spatial: '', anecdote: '', memoryScore: 0, feedback: '', synced: false
         },
-        
+
         targetItems: [],
         selectedItems: [],
         history: []
@@ -33,9 +33,14 @@ export const store = {
     listeners: [],
 
     init() {
-        const savedHistory = localStorage.getItem(STORAGE_KEY);
-        if (savedHistory) this.state.history = JSON.parse(savedHistory);
-        
+        try {
+            const savedHistory = localStorage.getItem(STORAGE_KEY);
+            if (savedHistory) this.state.history = JSON.parse(savedHistory);
+        } catch (e) {
+            console.error("Error cargando historial:", e);
+            this.state.history = [];
+        }
+
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             this.state.isDarkMode = true;
@@ -72,7 +77,7 @@ export const store = {
             date: new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
             synced: false
         };
-        
+
         // Auto tema
         if (mode === 'EVENING' && !this.state.isDarkMode) this.toggleTheme();
         if (mode === 'MORNING' && this.state.isDarkMode) this.toggleTheme();
@@ -80,7 +85,7 @@ export const store = {
         // Items aleatorios
         this.state.targetItems = [...MEMORY_ITEMS_POOL].sort(() => 0.5 - Math.random()).slice(0, 5);
         this.state.selectedItems = [];
-        
+
         this.setStep(AppStep.MORNING_RECALL);
     },
 
