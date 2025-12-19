@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neurolog-v1';
+const CACHE_NAME = 'neurolog-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -8,13 +8,14 @@ const ASSETS_TO_CACHE = [
   '/js/driveService.js',
   '/js/render.js',
   '/js/store.js',
-  '/manifest.json'
-  // Vite procesará esto y generará nombres con hash en producción, 
-  // pero esta estrategia básica sirve para el esqueleto.
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 // Instalar: Cachear archivos básicos
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
@@ -31,25 +32,34 @@ self.addEventListener('activate', (event) => {
           return caches.delete(key);
         }
       }));
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// Interceptar peticiones: Estrategia "Cache First, then Network"
+// Interceptar peticiones: Estrategia "Stale-While-Revalidate" para assets locales
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
   // Ignorar peticiones a Google APIs (Auth/Drive) para no romper el login
-  if (event.request.url.includes('googleapis') || event.request.url.includes('googleusercontent')) {
+  if (url.hostname.includes('googleapis.com') || url.hostname.includes('googleusercontent.com') || url.hostname.includes('accounts.google.com')) {
     return;
   }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Si está en cache, devolverlo (Offline mode)
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      // Si no, ir a internet
-      return fetch(event.request);
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
+      }).catch(() => {
+        // Fallback silencioso si falla el fetch (offline)
+      });
+
+      return cachedResponse || fetchPromise;
     })
   );
 });
