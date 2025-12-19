@@ -122,7 +122,7 @@ class App {
         else {
             // Caso 4: Todo perfecto y sincronizado
             el.className += "bg-emerald-50 border-emerald-200 text-emerald-600";
-            el.innerHTML = `<i data-lucide="cloud-check" class="w-4 h-4"></i> <span id="status-text">Todo guardado</span>`;
+            el.innerHTML = `<i data-lucide="wifi" class="w-4 h-4"></i>`;
         }
 
         // Importante: Refrescar iconos tras cambiar el innerHTML
