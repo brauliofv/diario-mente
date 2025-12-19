@@ -162,12 +162,10 @@ class App {
 
             let t = store.state.timer - 1;
 
-            // --- AQUÍ ESTABA EL ERROR ---
-            // Antes usábamos store.setState({ timer: t }), lo que redibujaba TODO.
-            // Ahora actualizamos la variable en silencio:
+
             store.state.timer = t;
 
-            // Y actualizamos SOLO el numerito en el HTML:
+
             updateVisualTimer(t);
 
             if (t <= 0) {
@@ -329,7 +327,7 @@ class App {
 
         this.container.innerHTML = html;
         // 3. REFRESCAR ICONOS DESPUES DE RENDERIZAR
-        createIcons({ icons }); // <--- CAMBIO IMPORTANTE
+        createIcons({ icons });
     }
 
     renderRetrievalGrid() {

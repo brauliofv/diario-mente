@@ -21,7 +21,7 @@ const calculateLevel = (count) => {
 const progressBar = (currentStep, isDark) => {
     if ([AppStep.WELCOME, AppStep.HISTORY, AppStep.COMPLETED, AppStep.ANALYSIS].includes(currentStep)) return '';
     const percent = PROGRESS_MAP[currentStep] || 0;
-    
+
     return `
     <div class="w-full mb-8 px-1 mt-4">
         <div class="flex justify-between text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-stone-500' : 'text-stone-500'}">
@@ -35,15 +35,9 @@ const progressBar = (currentStep, isDark) => {
     </div>`;
 };
 
-// ... (funciones calendar y historyCard se mantienen igual que la versión anterior) ...
-// PEGAR AQUÍ EL CÓDIGO DE calendar Y historyCard QUE TE DI EN LA RESPUESTA ANTERIOR
-// Si lo necesitas completo dímelo, pero para ahorrar espacio asumo que las tienes.
-// Solo asegúrate que calendar tenga los estilos actualizados.
 
 const calendar = (history, currentDate, selectedDateStr, isDark) => {
-    // ... (Mismo código de calendario anterior) ...
-    // Solo cambiaré el padding del contenedor si hace falta
-    // Copia el mismo de la respuesta anterior, funcionaba bien
+
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -52,7 +46,7 @@ const calendar = (history, currentDate, selectedDateStr, isDark) => {
     const sessionsByDay = {};
     history.forEach(h => {
         const d = new Date(h.timestamp);
-        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; 
+        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
         if (!sessionsByDay[key]) sessionsByDay[key] = [];
         sessionsByDay[key].push(h);
     });
@@ -64,7 +58,7 @@ const calendar = (history, currentDate, selectedDateStr, isDark) => {
         const hasMorning = sessions.some(s => s.sessionType === 'MORNING');
         const hasEvening = sessions.some(s => s.sessionType === 'EVENING');
         const isSelected = selectedDateStr === key;
-        const btnClass = isSelected 
+        const btnClass = isSelected
             ? (isDark ? 'bg-stone-700 text-white shadow-lg scale-105 z-10' : 'bg-stone-800 text-white shadow-lg scale-105 z-10')
             : (isDark ? 'bg-stone-900 text-stone-400 hover:bg-stone-800' : 'bg-white text-stone-600 hover:bg-stone-50');
         daysHtml += `
@@ -90,7 +84,7 @@ const calendar = (history, currentDate, selectedDateStr, isDark) => {
 };
 
 const historyCard = (entry, isDark) => {
-    // ... (Mismo código de historyCard anterior) ...
+
     const c = getClasses(isDark);
     const icon = entry.sessionType === 'MORNING' ? 'sun' : 'moon';
     const typeColor = entry.sessionType === 'MORNING' ? 'text-amber-500' : 'text-indigo-500';
@@ -112,7 +106,7 @@ const historyCard = (entry, isDark) => {
         <div class="p-4 border-b flex justify-between items-center ${isDark ? 'bg-stone-950 border-stone-800' : 'bg-stone-100 border-stone-200'}">
             <div class="flex items-center gap-3">
                 <div class="p-1.5 rounded-full bg-opacity-20 ${entry.sessionType === 'MORNING' ? 'bg-amber-500' : 'bg-indigo-500'} ${typeColor}"><i data-lucide="${icon}" class="w-4 h-4"></i></div>
-                <div><div class="font-bold text-sm ${c.textMain}">${entry.date}</div><div class="text-xs opacity-60">${new Date(entry.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div></div>
+                <div><div class="font-bold text-sm ${c.textMain}">${entry.date}</div><div class="text-xs opacity-60">${new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div></div>
             </div>
             <div class="flex items-center gap-2">
                  ${!entry.synced ? '<i data-lucide="cloud-off" class="w-4 h-4 text-orange-500" title="No sincronizado"></i>' : '<i data-lucide="check" class="w-4 h-4 text-green-500 opacity-50"></i>'}
@@ -184,7 +178,7 @@ export const Render = {
         </div>`;
     },
 
-    // ... (el resto de funciones stepForm, encoding, history, etc. se mantienen igual pero asegúrate de que usen el padding en el contenedor)
+
     stepForm: (state) => {
         const c = getClasses(state.isDarkMode);
         const fields = {
@@ -221,8 +215,8 @@ export const Render = {
             </button>
         </div>`;
     },
-    
-    // Encoding (Copiar encoding anterior pero asegurar que no se solape)
+
+
     encoding: (state) => {
         const c = getClasses(state.isDarkMode);
         return `
@@ -230,7 +224,11 @@ export const Render = {
         <div class="max-w-xl mx-auto text-center fade-in pt-10 pb-32">
             <h2 class="text-3xl font-bold mb-4 font-serif ${c.textMain}">Memoriza estos objetos</h2>
             <div class="grid grid-cols-5 gap-3 mb-8 ${state.isPaused ? 'blur-sm' : ''}">
-                ${state.targetItems.map(i => `<div class="p-3 rounded-xl border shadow flex flex-col items-center justify-center aspect-square ${c.bgCard}"><span class="text-3xl">${i.emoji}</span></div>`).join('')}
+                ${state.targetItems.map(i => `
+                    <div class="p-2 rounded-xl border shadow flex flex-col items-center justify-center aspect-square ${c.bgCard}">
+                        <span class="text-3xl mb-1">${i.emoji}</span>
+                        <span class="text-[10px] font-bold uppercase opacity-60 ${c.textMain}">${i.name}</span>
+                    </div>`).join('')}
             </div>
             <div id="timer-display" class="text-3xl font-bold mb-8 font-mono ${c.textMain}">00:30</div>
             <button onclick="window.app.nextStep()" class="px-8 py-3 rounded-xl font-bold ${c.btnPrimary}">¡Listos!</button>
@@ -238,24 +236,24 @@ export const Render = {
     },
 
     retrieval: (state) => `<div id="retrieval-container" class="pb-32"></div>`,
-    
-    // ... history y completed iguales a la version anterior ...
+
+
     history: (state) => {
-       const c = getClasses(state.isDarkMode);
-       // ... (Lógica de filtrado) ...
-       let filtered = state.history;
-       if (state.selectedFilterDate) {
+        const c = getClasses(state.isDarkMode);
+
+        let filtered = state.history;
+        if (state.selectedFilterDate) {
             filtered = filtered.filter(h => {
                 const d = new Date(h.timestamp);
                 const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
                 return key === state.selectedFilterDate;
             });
-       }
-       const cards = filtered.length 
-            ? filtered.map(h => historyCard(h, state.isDarkMode)).join('') 
+        }
+        const cards = filtered.length
+            ? filtered.map(h => historyCard(h, state.isDarkMode)).join('')
             : `<div class="text-center py-10 opacity-50 border-2 border-dashed rounded-xl ${c.border}">No hay entradas para esta fecha.</div>`;
 
-       return `
+        return `
         <div class="max-w-3xl mx-auto fade-in pb-20">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="window.app.goHome()" class="p-2 rounded-full hover:bg-black/5 flex items-center gap-2 ${c.textMain}"><i data-lucide="arrow-left"></i> Volver</button>
@@ -273,7 +271,7 @@ export const Render = {
             <div class="space-y-4 min-h-[300px]">${cards}</div>
         </div>`;
     },
-    
+
     analysis: () => `<div class="h-[60vh] flex items-center justify-center"><div class="animate-spin w-12 h-12 border-4 border-amber-500 rounded-full border-t-transparent"></div></div>`,
 
     completed: (state) => {

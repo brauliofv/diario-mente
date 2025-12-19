@@ -40,7 +40,26 @@ export const MEMORY_ITEMS_POOL = [
     { id: '8', emoji: '🔑', name: 'Llave' },
     { id: '9', emoji: '🍦', name: 'Helado' },
     { id: '10', emoji: '📚', name: 'Libros' },
-    // ... agregar resto de items
+    { id: '11', emoji: '🍎', name: 'Manzana' },
+    { id: '12', emoji: '⚽', name: 'Balón' },
+    { id: '13', emoji: '🕶️', name: 'Gafas' },
+    { id: '14', emoji: '🎧', name: 'Auriculares' },
+    { id: '15', emoji: '📷', name: 'Cámara' },
+    { id: '16', emoji: '🕯️', name: 'Vela' },
+    { id: '17', emoji: '🔦', name: 'Linterna' },
+    { id: '18', emoji: '🎒', name: 'Mochila' },
+    { id: '19', emoji: '🥪', name: 'Sándwich' },
+    { id: '20', emoji: '🥤', name: 'Refresco' },
+    { id: '21', emoji: '🛹', name: 'Skate' },
+    { id: '22', emoji: '🎨', name: 'Paleta' },
+    { id: '23', emoji: '🎻', name: 'Violín' },
+    { id: '24', emoji: '🔭', name: 'Telescopio' },
+    { id: '25', emoji: '🧭', name: 'Brújula' },
+    { id: '26', emoji: '💎', name: 'Diamante' },
+    { id: '27', emoji: '🍄', name: 'Seta' },
+    { id: '28', emoji: '🐚', name: 'Concha' },
+    { id: '29', emoji: '🥨', name: 'Pretzel' },
+    { id: '30', emoji: '🍩', name: 'Donut' }
 ];
 
 export const PROMPTS = {
@@ -48,7 +67,7 @@ export const PROMPTS = {
         EVENING: { title: "Mañana de Hoy", prompt: "¿Cuál fue tu primera interacción al despertar?", tip: "Cierra los ojos. ¿A qué olía el café?", icon: "sun" },
         MORNING: { title: "Mañana de Ayer", prompt: "Viaja mentalmente a ayer por la mañana.", tip: "Recuperación diferida.", icon: "sun" }
     },
-    // ... (Copiar el resto de prompts del archivo anterior)
+
     [AppStep.MID_MORNING_RECALL]: {
         EVENING: { title: "Media Mañana", prompt: "¿Qué sucedió entre el desayuno y el almuerzo?", tip: "Orden cronológico.", icon: "coffee" },
         MORNING: { title: "Media Mañana (Ayer)", prompt: "¿Qué hiciste ayer antes de comer?", tip: "Visualiza el lugar.", icon: "coffee" }
