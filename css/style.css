@@ -8,15 +8,34 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #a8a29e; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #78716c; }
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #a8a29e;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #78716c;
+}
 
 body.dark {
     background-color: #0c0a09;
@@ -24,5 +43,50 @@ body.dark {
 }
 
 /* Blur helper */
-.blur-sm { filter: blur(4px); }
-.pointer-events-none { pointer-events: none; }
+.blur-sm {
+    filter: blur(1px);
+}
+
+.pointer-events-none {
+    pointer-events: none;
+}
+
+/* Easing functions */
+::view-transition-group(root) {
+    animation-timing-function: var(--expo-in);
+}
+
+/* View Transitions API */
+::view-transition-group(root) {
+    animation-timing-function: var(--expo-in);
+}
+
+::view-transition-new(root) {
+    mask: url('public/brain-b.png') center / 0 no-repeat;
+    animation: scale 1s;
+    animation-fill-mode: both;
+}
+
+::view-transition-old(root),
+.dark::view-transition-old(root) {
+    animation: scale 1s;
+    animation-fill-mode: both;
+}
+
+@keyframes scale {
+    0% {
+        mask-size: 0;
+    }
+
+    10% {
+        mask-size: 50vmax;
+    }
+
+    90% {
+        mask-size: 50vmax;
+    }
+
+    100% {
+        mask-size: 4000vmax;
+    }
+}

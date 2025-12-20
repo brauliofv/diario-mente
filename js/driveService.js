@@ -71,7 +71,7 @@ export const DriveService = {
             const mergedMap = new Map();
             cloudData.forEach(item => mergedMap.set(item.id, item));
             localHistory.forEach(item => mergedMap.set(item.id, { ...item, synced: true })); // Marcar local como sync
-            
+
             const mergedArray = Array.from(mergedMap.values()).sort((a, b) => b.timestamp - a.timestamp);
 
             // 4. Subir
@@ -84,7 +84,7 @@ export const DriveService = {
             form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
             form.append('file', file);
 
-            const url = fileId 
+            const url = fileId
                 ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
                 : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
             const method = fileId ? 'PATCH' : 'POST';
@@ -99,7 +99,13 @@ export const DriveService = {
 
         } catch (error) {
             console.error("Error en Sync:", error);
-            throw error;
+            if (error.result && error.result.error) {
+                throw new Error(`Google Drive Error: ${error.result.error.message}`);
+            } else if (error.status === 401 || error.status === 403) {
+                throw new Error("Error de autorización. Por favor, inicia sesión nuevamente.");
+            } else {
+                throw error;
+            }
         }
     }
 };

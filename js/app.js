@@ -133,48 +133,33 @@ class App {
     // Timer
     // Reemplaza toda la función startTimer con esto:
     startTimer(seconds) {
-        // Limpiar intervalo anterior si existe
         if (store.state.timerInterval) clearInterval(store.state.timerInterval);
-
-        // Actualizamos el estado inicial SIN disparar renderizado (mutación directa)
         store.state.timer = seconds;
 
-        // Actualizar visualmente el timer inicial si existe el elemento
         const updateVisualTimer = (val) => {
             const el = document.getElementById('timer-display');
             if (el) {
                 const m = Math.floor(val / 60);
                 const s = val % 60;
                 el.innerText = `${m}:${s < 10 ? '0' + s : s}`;
-                if (val < 10) {
-                    el.classList.add('text-red-500', 'animate-pulse');
-                } else {
-                    el.classList.remove('text-red-500', 'animate-pulse');
-                }
+                el.classList.toggle('text-red-500', val < 10);
+                el.classList.toggle('animate-pulse', val < 10);
             }
         };
 
-        // Pintar el tiempo inicial
         updateVisualTimer(seconds);
 
-        const tick = () => {
+        store.state.timerInterval = setInterval(() => {
             if (store.state.isPaused) return;
 
-            let t = store.state.timer - 1;
+            store.state.timer--;
+            updateVisualTimer(store.state.timer);
 
-
-            store.state.timer = t;
-
-
-            updateVisualTimer(t);
-
-            if (t <= 0) {
+            if (store.state.timer <= 0) {
                 clearInterval(store.state.timerInterval);
                 this.nextStep();
             }
-        };
-
-        store.state.timerInterval = setInterval(tick, 1000);
+        }, 1000);
     }
 
     togglePause() { store.setState({ isPaused: !store.state.isPaused }); }

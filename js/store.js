@@ -2,7 +2,7 @@
 import { AppStep, MEMORY_ITEMS_POOL } from './constants.js';
 
 const STORAGE_KEY = 'neurolog_sessions_v2';
-const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+const generateId = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2);
 
 // Singleton Store
 export const store = {
@@ -62,10 +62,18 @@ export const store = {
     },
 
     toggleTheme() {
-        this.state.isDarkMode = !this.state.isDarkMode;
-        document.body.classList.toggle('dark', this.state.isDarkMode);
-        localStorage.setItem('theme', this.state.isDarkMode ? 'dark' : 'light');
-        this.notify();
+        const switchTheme = () => {
+            this.state.isDarkMode = !this.state.isDarkMode;
+            document.body.classList.toggle('dark', this.state.isDarkMode);
+            localStorage.setItem('theme', this.state.isDarkMode ? 'dark' : 'light');
+            this.notify();
+        };
+
+        if (!document.startViewTransition) {
+            switchTheme();
+        } else {
+            document.startViewTransition(switchTheme);
+        }
     },
 
     startSession(mode) {
