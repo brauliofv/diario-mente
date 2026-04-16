@@ -1,5 +1,5 @@
 // js/store.js
-import { AppStep, MEMORY_ITEMS_POOL, GUIDED_PROMPTS_POOL } from './constants.js';
+import { AppStep, MEMORY_ITEMS_POOL, GUIDED_PROMPTS_POOL, PROMPTS } from './constants.js';
 
 const STORAGE_KEY = 'neurolog_sessions_v2';
 const generateId = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -124,7 +124,14 @@ export const store = {
         const timeSeed = new Date().getTime();
         const pickRandom = (arr, seedMod) => arr[Math.floor(Math.abs(Math.sin(timeSeed * seedMod)) * arr.length)];
         
+        // Determinar contexto horario
+        const isMorning = new Date().getHours() < 12;
+        const timeMode = isMorning ? 'MORNING' : 'EVENING';
+
         this.state.guidedSessionQuestions = [
+            PROMPTS[AppStep.MORNING_RECALL][timeMode],
+            PROMPTS[AppStep.AFTERNOON_RECALL][timeMode],
+            PROMPTS[AppStep.ANECDOTE][timeMode],
             pickRandom(GUIDED_PROMPTS_POOL.SENSORY, 1),
             pickRandom(GUIDED_PROMPTS_POOL.GENERAL, 2),
             pickRandom(GUIDED_PROMPTS_POOL.PARTICULAR, 3)

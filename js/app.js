@@ -82,7 +82,7 @@ class App {
         const fab = document.createElement('button');
         fab.id = 'guided-mode-fab';
         fab.className = 'fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl transition-transform hover:scale-110 bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 group';
-        fab.title = 'Modo Diario Guiado (Offline)';
+        fab.title = 'Tu diario a lápiz';
         fab.innerHTML = '<i data-lucide="pen-tool" class="w-6 h-6"></i>';
         
         fab.addEventListener('click', () => {
@@ -181,11 +181,17 @@ class App {
             if (store.state.isPaused) return;
 
             store.state.timer--;
-            updateVisualTimer(store.state.timer);
-
-            if (store.state.timer <= 0) {
+            
+            if (store.state.timer > 0) {
+                updateVisualTimer(store.state.timer);
+            } else {
                 clearInterval(store.state.timerInterval);
-                this.nextStep();
+                const el = document.getElementById('timer-display');
+                if (el) {
+                    el.innerText = "¡Tiempo cumplido!";
+                    el.classList.remove('text-red-500', 'text-4xl');
+                    el.classList.add('text-stone-400', 'animate-pulse', 'text-xl', 'italic');
+                }
             }
         }, 1000);
     }

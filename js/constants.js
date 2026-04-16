@@ -104,17 +104,21 @@ export const GUIDED_PROMPTS_POOL = {
         { title: "Vista", prompt: "Observa un objeto cercano con detalle. ¿Qué texturas, colores y sombras logras percibir sin nombrarlo?", icon: "eye" },
         { title: "Oído", prompt: "Cierra los ojos un momento y concéntrate en el sonido más distante que puedas captar. Descúbrelo.", icon: "ear" },
         { title: "Gusto", prompt: "Busca en tu memoria gustativa el último sabor complejo que experimentaste (café, especias, pan). Descríbelo mentalmente.", icon: "coffee" },
-        { title: "Térmica", prompt: "Percibe la temperatura en tus manos y tu frente. ¿Qué diferencias notas entra ambas sensaciones?", icon: "thermometer" }
+        { title: "Térmica", prompt: "Percibe la temperatura en tus manos y tu frente. ¿Qué diferencias notas entra ambas sensaciones?", icon: "thermometer" },
+        { title: "Olfato", prompt: "Intenta identificar un olor en este momento. Si no lo hay, recuerda el olor más vívido de hoy.", icon: "wind" },
+        { title: "Propiocepción", prompt: "Cierra los ojos. Siente exactamente cómo están apoyados tus pies y espalda. Describe la presión.", icon: "activity" }
     ],
     GENERAL: [
         { title: "Reflexión", prompt: "Si el día de hoy fuera un capítulo de un libro, ¿qué título sugerente le pondrías?", icon: "book" },
         { title: "Emoción", prompt: "Piensa en el momento más calmado del día de ayer o de hoy. ¿Dónde estabas y cómo se sentía cuerpo?", icon: "wind" },
         { title: "Aprendizaje", prompt: "Visualiza un pequeño obstáculo reciente. ¿De qué otra forma se podría haber rodeado hoy?", icon: "lightbulb" },
-        { title: "Gratitud", prompt: "Trae a tu mente una interacción sencilla que te hizo sentir bien, por pequeña que fuera.", icon: "heart" }
+        { title: "Gratitud", prompt: "Trae a tu mente una interacción sencilla que te hizo sentir bien, por pequeña que fuera.", icon: "heart" },
+        { title: "Sorpresa", prompt: "¿Cuál fue el momento más inesperado de las últimas 24 horas?", icon: "zap" }
     ],
     PARTICULAR: [
         { title: "Detalle", prompt: "Recuerda una frase o palabra curiosa que alguien haya pronunciado en tu presencia últimamente.", icon: "message-circle" },
         { title: "Pausa", prompt: "Toma aire. Identifica un esfuerzo físico que hayas realizado y agradece silenciosamente a tus músculos.", icon: "activity" },
-        { title: "Curiosidad", prompt: "¿Había alguna forma, sombra o patrón de luz interesante en alguna pared hoy?", icon: "sun" }
+        { title: "Curiosidad", prompt: "¿Había alguna forma, sombra o patrón de luz interesante en alguna pared hoy?", icon: "sun" },
+        { title: "Conexión", prompt: "¿A quién miraste a los ojos por más de dos segundos hoy? Reconstruye su expresión.", icon: "users" }
     ]
 };

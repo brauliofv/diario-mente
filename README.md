@@ -28,6 +28,7 @@ Ayudar a las personas a combatir el "piloto automático" diario. Al obligar al c
 *   **Dos Modos de Sesión:**
     *   ☀️ **Matutina:** Activación cognitiva recordando el día de ayer (Recuperación diferida).
     *   🌙 **Nocturna:** Consolidación de memoria recordando el día actual antes de dormir.
+*   **✍️ Modo Diario a Lápiz (Offline Guiado):** Una experiencia enfocada donde la app solo actúa como guía visual con temporizadores para que escribas a mano en tu libreta física, combinando las preguntas de sesión con dinámicas rotativas.
 *   **🧩 Ejercicios Cognitivos Intercalados:** Desafío de memoria de trabajo (memorizar y recuperar objetos) integrado en el flujo del diario.
 *   **☁️ Sincronización en la Nube:** Integración real con **Google Drive** para guardar tu progreso sin servidores intermediarios.
 *   **🔒 Privacidad Total:** Los datos viven en tu navegador o en tu Drive personal. No hay bases de datos externas.
@@ -106,6 +107,7 @@ To help people combat daily "autopilot." By forcing the brain to reconstruct the
 *   **Two Session Modes:**
     *   ☀️ **Morning:** Cognitive activation by remembering yesterday (Delayed recall).
     *   🌙 **Evening:** Memory consolidation by remembering the current day before sleep.
+*   **✍️ Pencil Diary Mode (Offline Guided):** A focused experience where the app acts solely as a visual guide with timers, allowing you to write by hand in your physical notebook. It combines session questions with rotating sensory dynamics.
 *   **🧩 Interleaved Cognitive Exercises:** Working memory challenge (memorizing and retrieving objects) integrated into the journal flow.
 *   **☁️ Cloud Sync:** Real integration with **Google Drive** to save your progress without intermediary servers.
 *   **🔒 Total Privacy:** Data lives in your browser or your personal Drive. No external databases.
