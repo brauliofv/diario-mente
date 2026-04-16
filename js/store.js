@@ -1,5 +1,5 @@
 // js/store.js
-import { AppStep, MEMORY_ITEMS_POOL } from './constants.js';
+import { AppStep, MEMORY_ITEMS_POOL, GUIDED_PROMPTS_POOL } from './constants.js';
 
 const STORAGE_KEY = 'neurolog_sessions_v2';
 const generateId = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -14,6 +14,12 @@ export const store = {
         isSyncing: false,
         timer: 0,
         timerInterval: null,
+
+        // Offline Guided Mode
+        isGuidedMode: false,
+        guidedSessionsCompleted: 0,
+        guidedSessionQuestions: [],
+        guidedCurrentQuestionIndex: 0,
 
         // Calendario
         calendarDate: new Date(), // Fecha que se está viendo
@@ -40,6 +46,11 @@ export const store = {
             console.error("Error cargando historial:", e);
             this.state.history = [];
         }
+
+        try {
+            const guidedStats = localStorage.getItem('neurolog_guided_stats');
+            if (guidedStats) this.state.guidedSessionsCompleted = parseInt(guidedStats) || 0;
+        } catch (e) {}
 
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
@@ -95,6 +106,39 @@ export const store = {
         this.state.selectedItems = [];
 
         this.setStep(AppStep.MORNING_RECALL);
+    },
+
+    startGuidedSession() {
+        this.state.isGuidedMode = true;
+        this.state.sessionMode = 'GUIDED';
+        this.state.currentEntry = { id: generateId(), timestamp: Date.now(), sessionType: 'GUIDED', synced: false };
+        
+        // Auto tema guiado
+        if (!this.state.isDarkMode) this.toggleTheme();
+
+        // Items aleatorios para la fase de Memory Encoding reutilizada
+        this.state.targetItems = [...MEMORY_ITEMS_POOL].sort(() => 0.5 - Math.random()).slice(0, 5);
+        this.state.selectedItems = [];
+
+        // Generación de preguntas basadas en pseudo-semilla de sesión
+        const timeSeed = new Date().getTime();
+        const pickRandom = (arr, seedMod) => arr[Math.floor(Math.abs(Math.sin(timeSeed * seedMod)) * arr.length)];
+        
+        this.state.guidedSessionQuestions = [
+            pickRandom(GUIDED_PROMPTS_POOL.SENSORY, 1),
+            pickRandom(GUIDED_PROMPTS_POOL.GENERAL, 2),
+            pickRandom(GUIDED_PROMPTS_POOL.PARTICULAR, 3)
+        ];
+        this.state.guidedCurrentQuestionIndex = 0;
+        
+        this.setStep(AppStep.GUIDED_COGNITIVE_ACTIVATION);
+    },
+
+    finishGuidedSession() {
+        this.state.guidedSessionsCompleted++;
+        localStorage.setItem('neurolog_guided_stats', this.state.guidedSessionsCompleted.toString());
+        this.state.isGuidedMode = false;
+        this.setStep(AppStep.WELCOME);
     },
 
     // Calendario Logica

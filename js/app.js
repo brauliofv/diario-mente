@@ -74,6 +74,34 @@ class App {
 
 
         createIcons({ icons });
+
+        this.injectGuidedFAB();
+    }
+
+    injectGuidedFAB() {
+        const fab = document.createElement('button');
+        fab.id = 'guided-mode-fab';
+        fab.className = 'fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-2xl transition-transform hover:scale-110 bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 group';
+        fab.title = 'Modo Diario Guiado (Offline)';
+        fab.innerHTML = '<i data-lucide="pen-tool" class="w-6 h-6"></i>';
+        
+        fab.addEventListener('click', () => {
+             // Si ya estamos en alguna sesión que no es WELCOME, confirmamos salir.
+             if (store.state.currentStep !== AppStep.WELCOME) {
+                 if(confirm("¿Abandonar la sesión actual e iniciar Modo Guiado?")) {
+                     store.startGuidedSession();
+                     this.startTimer(30);
+                     window.scrollTo(0,0);
+                 }
+             } else {
+                 store.startGuidedSession();
+                 this.startTimer(30);
+                 window.scrollTo(0,0);
+             }
+        });
+
+        document.body.appendChild(fab);
+        import('lucide').then(lucide => lucide.createIcons({ icons: lucide.icons }));
     }
 
     // Nueva función inteligente de estado
@@ -170,6 +198,30 @@ class App {
 
     nextStep() {
         const current = store.state.currentStep;
+
+        if (store.state.isGuidedMode) {
+            if (current === AppStep.GUIDED_COGNITIVE_ACTIVATION) {
+                store.setStep(AppStep.MEMORY_ENCODING);
+                this.startTimer(30);
+                window.scrollTo(0, 0);
+                return;
+            } else if (current === AppStep.MEMORY_ENCODING) {
+                store.setStep(AppStep.GUIDED_QUESTION);
+                this.startTimer(60);
+                window.scrollTo(0, 0);
+                return;
+            } else if (current === AppStep.GUIDED_QUESTION) {
+                if (store.state.guidedCurrentQuestionIndex < store.state.guidedSessionQuestions.length - 1) {
+                    store.setState({ guidedCurrentQuestionIndex: store.state.guidedCurrentQuestionIndex + 1 });
+                    this.startTimer(60);
+                    window.scrollTo(0, 0);
+                } else {
+                    store.finishGuidedSession();
+                }
+                return;
+            }
+        }
+
         let next = AppStep.WELCOME;
         let time = 120;
 
@@ -300,6 +352,8 @@ class App {
         const step = state.currentStep;
 
         if (step === AppStep.WELCOME) html = Render.welcome(state);
+        else if (step === AppStep.GUIDED_COGNITIVE_ACTIVATION) html = Render.guidedCognitive(state);
+        else if (step === AppStep.GUIDED_QUESTION) html = Render.guidedQuestion(state);
         else if (step === AppStep.MEMORY_ENCODING) html = Render.encoding(state);
         else if (step === AppStep.MEMORY_RETRIEVAL) {
             html = Render.retrieval(state);
@@ -311,6 +365,15 @@ class App {
         else html = Render.stepForm(state);
 
         this.container.innerHTML = html;
+        let shouldHideFab = false;
+        if (step === AppStep.GUIDED_COGNITIVE_ACTIVATION || step === AppStep.GUIDED_QUESTION || (state.isGuidedMode && step === AppStep.MEMORY_ENCODING)) {
+            shouldHideFab = true;
+        }
+        const fab = document.getElementById('guided-mode-fab');
+        if (fab) {
+            fab.style.display = shouldHideFab ? 'none' : 'block';
+        }
+
         // 3. REFRESCAR ICONOS DESPUES DE RENDERIZAR
         createIcons({ icons });
     }

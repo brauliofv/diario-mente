@@ -237,6 +237,53 @@ export const Render = {
 
     retrieval: (state) => `<div id="retrieval-container" class="pb-32"></div>`,
 
+    guidedCognitive: (state) => {
+        const c = getClasses(state.isDarkMode);
+        return `
+        <div class="max-w-xl mx-auto text-center fade-in pt-10 pb-32">
+            <h2 class="text-3xl font-bold mb-4 font-serif ${c.textMain}">Activación Cognitiva</h2>
+            <div class="p-6 rounded-xl border shadow mb-8 ${c.bgCard}">
+                <p class="text-xl ${c.textMain} font-medium mb-4">Cuenta regresiva mentalmente desde 100 hasta 0,<br>restando de 3 en 3.</p>
+                <div class="inline-block px-4 py-2 rounded-full border bg-opacity-20 text-indigo-500 font-mono text-lg ${c.border}">Ej: 100... 97... 94...</div>
+            </div>
+            <div id="timer-display" class="text-4xl font-bold mb-8 font-mono ${c.textMain} ${state.isPaused ? 'blur-sm' : ''}">00:30</div>
+            <button onclick="window.app.nextStep()" class="px-8 py-3 rounded-xl font-bold ${c.btnPrimary}">Siguiente</button>
+             <button onclick="window.app.togglePause()" class="fixed bottom-8 right-8 p-4 rounded-full shadow-2xl z-50 transition-transform hover:scale-110 ${c.btnPrimary}">
+                <i data-lucide="${state.isPaused ? 'play' : 'pause'}" class="w-6 h-6"></i>
+            </button>
+        </div>`;
+    },
+
+    guidedQuestion: (state) => {
+        const c = getClasses(state.isDarkMode);
+        const question = state.guidedSessionQuestions[state.guidedCurrentQuestionIndex];
+        return `
+        <div class="w-full mb-8 px-1 mt-4">
+            <div class="flex justify-between text-xs font-bold uppercase tracking-wider mb-2 ${state.isDarkMode ? 'text-stone-500' : 'text-stone-500'}">
+                <span>Preguntas</span>
+                <span>${state.guidedCurrentQuestionIndex + 1} / ${state.guidedSessionQuestions.length}</span>
+            </div>
+            <div class="h-2 rounded-full overflow-hidden ${state.isDarkMode ? 'bg-stone-800' : 'bg-stone-300'}">
+                <div class="h-full transition-all duration-700 ease-in-out relative ${state.isDarkMode ? 'bg-indigo-500' : 'bg-stone-600'}" style="width: ${((state.guidedCurrentQuestionIndex + 1) / state.guidedSessionQuestions.length) * 100}%"></div>
+            </div>
+        </div>
+        <div class="max-w-xl mx-auto text-center fade-in pt-4 pb-32">
+            <div class="flex justify-center mb-6">
+                <div class="p-4 border rounded-full ${c.bgCard}"><i data-lucide="${question.icon}" class="w-8 h-8 ${c.textMain}"></i></div>
+            </div>
+            <h2 class="text-xl font-bold mb-2 uppercase tracking-widest opacity-60 ${c.textMain}">${question.title}</h2>
+            <div class="p-8 rounded-xl border shadow-lg mb-8 min-h-[200px] flex items-center justify-center ${c.bgCard}">
+                <p class="text-2xl ${c.textMain} font-medium leading-relaxed">${question.prompt}</p>
+            </div>
+            <div id="timer-display" class="text-4xl font-bold mb-8 font-mono ${c.textMain} ${state.isPaused ? 'blur-sm' : ''}">01:00</div>
+            <button onclick="window.app.nextStep()" class="w-full py-4 rounded-xl font-bold text-lg shadow-md hover:shadow-lg transition-all ${c.btnPrimary} active:scale-95">
+                Siguiente <i data-lucide="chevron-right" class="inline ml-1"></i>
+            </button>
+            <button onclick="window.app.togglePause()" class="fixed bottom-8 right-8 p-4 rounded-full shadow-2xl z-50 transition-transform hover:scale-110 ${c.btnPrimary}">
+                <i data-lucide="${state.isPaused ? 'play' : 'pause'}" class="w-6 h-6"></i>
+            </button>
+        </div>`;
+    },
 
     history: (state) => {
         const c = getClasses(state.isDarkMode);
